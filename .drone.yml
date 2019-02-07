@@ -25,7 +25,7 @@ steps:
   - name: docker
     path: /var/run/docker.sock
   commands:
-  - docker login - $USERNAME -e $PASSWORD
+  - docker login -e $USERNAME -e $PASSWORD
   - docker push victorhbfernandes/tracer:${DRONE_COMMIT}
   environment:
     USERNAME:
