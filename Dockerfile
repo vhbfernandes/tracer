@@ -1,5 +1,10 @@
-FROM python:2.7-alpine
-WORKDIR /app
-ADD . /app
-EXPOSE 5003
-CMD ["/bin/sh", "-c", "python tracer.py > /dev/stdout 2>&1"]
+FROM golang:onbuild AS build
+
+WORKDIR /build
+COPY . /build
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o app .
+
+FROM scratch
+COPY --from=build /build/app /app
+CMD ["./app"]
