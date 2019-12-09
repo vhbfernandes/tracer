@@ -5,25 +5,16 @@ steps:
   #passo desnecessario, fiz so pra ver funcionar // podia usar a plugins/docker que faz todos os passos
 - name: build
   image: docker
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
+  environment:
+    - DOCKER_HOST=unix:///drone/docker.sock
   commands:
   - docker build -t tracer .
-
-- name: tag
-  image: docker
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
-  commands:
   - docker tag tracer victorhbfernandes/tracer:${DRONE_COMMIT}
 
 - name: push
   image: docker
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
+  environment:
+    - DOCKER_HOST=unix:///drone/docker.sock
   commands:
   - docker login -u $USERNAME -p $PASSWORD
   - docker push victorhbfernandes/tracer:${DRONE_COMMIT}
