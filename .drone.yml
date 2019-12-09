@@ -5,17 +5,19 @@ type: kubernetes
 steps:
   #passo desnecessario, fiz so pra ver funcionar // podia usar a plugins/docker que faz todos os passos
 - name: build
-  image: plugins/docker
-  settings:
-    debug: true
+  image: docker:dind
+  volumes:
+  - name: dockersock
+    path: /var/run
   commands:
   - docker build -t tracer .
   - docker tag tracer victorhbfernandes/tracer:${DRONE_COMMIT}
 
 - name: push
-  image: plugins/docker
-  settings:
-    debug: true
+  image: docker:dind
+  volumes:
+  - name: dockersock
+    path: /var/run
   commands:
   - docker login -u $USERNAME -p $PASSWORD
   - docker push victorhbfernandes/tracer:${DRONE_COMMIT}
@@ -24,3 +26,8 @@ steps:
       from_secret: docker_username
     PASSWORD:
       from_secret: docker_password
+
+volumes:
+- name: dockersock
+  host:
+    path: /var/run/docker.sock
