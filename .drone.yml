@@ -1,20 +1,17 @@
 kind: pipeline
 name: default
+type: kubernetes
 
 steps:
   #passo desnecessario, fiz so pra ver funcionar // podia usar a plugins/docker que faz todos os passos
 - name: build
-  image: docker
-  environment:
-    - DOCKER_HOST=unix:///drone/docker.sock
+  image: plugins/docker
   commands:
   - docker build -t tracer .
   - docker tag tracer victorhbfernandes/tracer:${DRONE_COMMIT}
 
 - name: push
-  image: docker
-  environment:
-    - DOCKER_HOST=unix:///drone/docker.sock
+  image: plugins/docker
   commands:
   - docker login -u $USERNAME -p $PASSWORD
   - docker push victorhbfernandes/tracer:${DRONE_COMMIT}
@@ -23,8 +20,3 @@ steps:
       from_secret: docker_username
     PASSWORD:
       from_secret: docker_password
-
-volumes:
-- name: docker
-  host:
-    path: /var/run/docker.sock
